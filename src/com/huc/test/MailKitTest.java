@@ -12,7 +12,7 @@ public class MailKitTest {
     //发送邮件
     public static void send(){
         MailKit.config(MailKit.SMTP_163, "huc8023cheny@163.com", "253678Hu");
-        boolean flag = MailKit.send("459382234@qq.com", "测试发送邮件", "测试发送邮件内容");
+        boolean flag = MailKit.send("459382234@qq.com", "公司错误邮件", "明天早上到公司集合，请各位注意好时间");
         System.out.println(flag);
     }
 
