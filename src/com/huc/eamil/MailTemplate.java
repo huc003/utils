@@ -10,28 +10,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
- 
+
 /**
- * ÓÊ¼ş·¢ËÍÄ£°å
+ * é‚®ä»¶å‘é€æ¨¡æ¿
  */
 public class MailTemplate {
- 
+
     private String templateBody;
     private List<String> ccMails = new ArrayList<String>();
     private List<String> toMails = new ArrayList<String>();
     private List<String> fileList = new ArrayList<String>();
-     
+
     public MailTemplate() {
     }
-     
+
     public MailTemplate(String templetPath, String toMail, String ccMail) throws IOException {
         loadTemplet(templetPath);
-	    this.toMails.add(toMail);
-	    this.ccMails.add(ccMail);
+        this.toMails.add(toMail);
+        this.ccMails.add(ccMail);
     }
-     
+
     /**
-     * Ìí¼Ó¸½¼ş
+     * æ·»åŠ é™„ä»¶
      * @param filePath
      * @return
      */
@@ -39,9 +39,9 @@ public class MailTemplate {
         this.fileList.add(filePath);
         return this;
     }
-     
+
     /**
-     * Ìí¼Ó¸½¼şÁĞ±í
+     * æ·»åŠ é™„ä»¶åˆ—è¡¨
      * @param filePath
      * @return
      */
@@ -51,9 +51,9 @@ public class MailTemplate {
         }
         return this;
     }
-     
+
     /**
-     * ·¢ËÍ¸øË­
+     * å‘é€ç»™è°
      * @param toMail
      * @return
      */
@@ -65,7 +65,7 @@ public class MailTemplate {
         }
         return this;
     }
-     
+
     public MailTemplate ccMail(String... ccMails){
         if(null != ccMails && ccMails.length > 0){
             for(String ccMail : ccMails){
@@ -74,9 +74,9 @@ public class MailTemplate {
         }
         return this;
     }
-     
+
     /**
-     * ¼ÓÔØÄ£°å
+     * åŠ è½½æ¨¡æ¿
      * @param templetPath
      * @return
      * @throws IOException
@@ -85,7 +85,7 @@ public class MailTemplate {
         InputStream input = null;
         InputStreamReader read = null;
         BufferedReader reader = null;
- 
+
         if (!new File(templetPath).exists()) {
             templateBody = "";
         }
@@ -107,31 +107,31 @@ public class MailTemplate {
             read.close();
             input.close();
         }
-         
+
         return this;
     }
- 
+
     @Override
     public String toString() {
         return this.templateBody;
     }
- 
+
     public String getToMail() {
         if(null != toMails && toMails.size() > 0){
             StringUtils.join(toMails, ",").substring(1);
         }
         return null;
     }
- 
+
     public String getCcMail() {
         if(null != ccMails && ccMails.size() > 0){
-        	StringUtils.join(ccMails, ",").substring(1);
+            StringUtils.join(ccMails, ",").substring(1);
         }
         return null;
     }
-     
+
     public List<String> getFileList() {
         return fileList;
     }
-     
+
 }

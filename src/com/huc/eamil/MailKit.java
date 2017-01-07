@@ -13,244 +13,244 @@ import java.util.concurrent.TimeoutException;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * ·¢ËÍÓÊ¼ş¹¤¾ßÀà
+ * å‘é€é‚®ä»¶å·¥å…·ç±»
  * @author Administrator
  *
  */
 public class MailKit {
-	
-	/**³£¼ûÓÊ¼ş·¢ËÍĞ­ÒéµØÖ·*/
-	public static final String SMTP_QQ = "smtp.qq.com";
-	public static final String SMTP_163 = "smtp.163.com";
-	public static final String SMTP_162 = "smtp.162.com";
-	public static final String SMTP_SINA = "smtp.sina.com";
-	public static final String SMTP_GMAIL = "smtp.gmail.com";
-	
-	private static String CFG_SMTP = SMTP_QQ;
-	private static String SEND_USER = "";
-	private static String SEND_PASSWORD = "";
-	
-	/**
-	 * ÅäÖÃÓÊ¼şĞ­ÒéºÍÕË»§
-	 * @param smtp  smtpĞ­Òé
-	 * @param user ·¢¼şÈËÓÃ»§Ãû
-	 * @param password ·¢¼şÈËÃÜÂë
-	 */
-	public static void config(String smtp,String user,String password){
-		CFG_SMTP = smtp;
-		SEND_USER = user;
-		SEND_PASSWORD = password;
-	}
-	
-	/**
-	 * ¸ù¾İÄ£°å·¢ËÍ
-	 * @param mailTemplate
-	 * @param subject
-	 * @return
-	 */
-	public static boolean send(MailTemplate mailTemplate,String subject){
-		if(null != mailTemplate && StringUtils.isNotBlank(subject)){
-			 return sendProcess(CFG_SMTP, SEND_USER, SEND_PASSWORD, 
-	                    mailTemplate.getToMail(), mailTemplate.getCcMail(), 
-	                    subject, mailTemplate.toString(), mailTemplate.getFileList());
-		}
-		return false;
-		
-	}
 
-	/**
-	 * ·¢ËÍÓÊ¼ş
-	 * @param toMail ÊÕ¼şÈËµØÖ·
-	 * @param subject ·¢ËÍÖ÷Ìâ
-	 * @param content ·¢ËÍÄÚÈİ
-	 * @return
-	 */
-	public static boolean send(String toMail,String subject,String content){
-		return sendProcess(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, null, subject, content, null);
-	}
-	
-	/***
-	 * ·¢ËÍÓÊ¼ş²¢·¢ËÍ¸£½¨
-	 * @param toMail ÊÕ¼şÈËµØÖ·
-	 * @param subject ·¢ËÍ±êÌâ
-	 * @param content ·¢ËÍÄÚÈİ
-	 * @param files ¸½¼şÁĞ±í
- 	 * @return
-	 */
-	public static boolean send(String toMail,String subject,String content,String ...files){
-		return sendProcess(CFG_SMTP,SEND_USER,SEND_PASSWORD,toMail,null,subject,content,Arrays.asList(files));
-	}
-	
-	/***
-	 * ·¢ËÍÓÊ¼ş²¢·¢ËÍ¸£½¨
-	 * @param toMail ÊÕ¼şÈËµØÖ·
-	 * @param subject ·¢ËÍ±êÌâ
-	 * @param content ·¢ËÍÄÚÈİ
-	 * @param files ¸½¼şÁĞ±í
- 	 * @return
-	 */
-	public static boolean send(String toMail,String subject,String content,List<String> files){
-		return sendProcess(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, null, subject, content, files);
-	}
-	
-	/***
-	 * ·¢ËÍÓÊ¼ş²¢ÇÒ³­ËÍ
-	 * @param toMail ÊÕ¼şÈËµØÖ·
-	 * @param ccMail ³­ËÍµØÖ·
-	 * @param subject ·¢ËÍÖ÷Ìâ
-	 * @param content ·¢ËÍÄÚÈİ
-	 * @return
-	 */
-	public static boolean sendAndcc(String toMail,String ccMail,String subject,String content){
-		return sendProcess(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, ccMail, subject, content, null);
-	}
-	
-	/**
-	 * ·¢ËÍÓÊ¼ş²¢³­ËÍ£¬´ø¸½¼ş
-	 * @param toMail ÊÕ¼şÈËµØÖ·
-	 * @param ccMail ³­ËÍµØÖ·
-	 * @param subject 
-	 * @param content
-	 * @param files
-	 * @return
-	 */
-	public static boolean sendAndcc(String toMail,String ccMail,String subject,String content,String ...files){
-		return sendProcess(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, ccMail, subject, content, Arrays.asList(files));
-	}
-	
-	/**
-	 * ·¢ËÍÓÊ¼ş²¢³­ËÍ£¬´ø¸½¼ş
-	 * @param toMail ÊÕ¼şÈËµØÖ·
-	 * @param ccMail ³­ËÍµØÖ·
-	 * @param subject 
-	 * @param content
-	 * @param files
-	 * @return
-	 */
-	public static boolean sendAndcc(String toMail,String ccMail,String subject,String content,List<String> files){
-		return sendProcess(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, ccMail, subject, content, files);
-	}
-	
-	/**
-	 * ·¢ËÍÓÊ¼ş
-	 * @param smtp Ğ­Òé
-	 * @param fromAddress ·¢¼şÈËµØÖ·
-	 * @param fromPass ·¢¼şÈËÃÜÂë
-	 * @param toMailList ÊÕ¼şÈËµØÖ·
-	 * @param ccAddress ³­ËÍµØÖ·
-	 * @param subject ÓÊ¼ş±êÌâ
-	 * @param content ÓÊ¼şÄÚÈİ
-	 * @param fileList ¸½¼ş
-	 * @return
-	 */
-	public static boolean sendProcess(String smtp,String fromAddress,String fromPass
-			,String toMailList,String ccAddress,String subject,String content,List<String> fileList){
-		try {
-			EmailHandle emailHandle = new EmailHandle(smtp);
-			emailHandle.setFrom(fromAddress);
-			emailHandle.setNeedAuth(true);
-			emailHandle.setSubject(subject);
-			emailHandle.setBody(content);
-			emailHandle.setToList(toMailList);
-			
-			/**Ìí¼Ó³­ËÍ**/
-			if(StringUtils.isNotEmpty(ccAddress)){
-				emailHandle.setCopyToList(ccAddress);
-			}
-			
-			emailHandle.setFrom(fromAddress);
-			emailHandle.setNamePass(fromAddress, fromPass);
-			
-			if(null != fileList && fileList.size()>0){
-				/**¸½¼ÓÎÄ¼şÂ·¾¢**/
-				for (String file : fileList) {
-					emailHandle.addFileAffix(file);
-				}
-			}
-			return emailHandle.sendEmail();
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-		return false;
-	}
-	
-	/*******************************************************Òì²½·¢ËÍ£ºS***************************************************/
-	/**
-	 * ¸ù¾İÄ£°å·¢ËÍ
-	 * @param mailTemplate
-	 * @param subject
-	 * @return
-	 */
-	public static void asynSend(MailTemplate mailTemplate,String subject){
-		if(null != mailTemplate && StringUtils.isNotBlank(subject)){
-			asynSend(CFG_SMTP, SEND_USER, SEND_PASSWORD, 
-	                    mailTemplate.getToMail(), mailTemplate.getCcMail(), 
-	                    subject, mailTemplate.toString(), mailTemplate.getFileList());
-		}
-	}
-	
-	/**
-	 * Òì²½·¢ËÍÓÊ¼ş
-	 * @param toMail ÊÕ¼şÈËµØÖ·
-	 * @param subject ÓÊ¼ş±êÌâ
-	 * @param content ÓÊ¼şÄÚÈİ
-	 */
-	public static void asynSend(final String toMail,final String subject,final String content){
-		asynSend(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, null, subject, content, null);
-	}
-	
-	/***
-	 * Òì²½·¢ËÍÓÊ¼ş²¢³­ËÍ
-	 * @param toMail ÊÕ¼şÈËµØÖ·
-	 * @param ccMail ³­ËÍÈËµØÖ·
-	 * @param subject ÓÊ¼ş±êÌâ
-	 * @param content ÓÊ¼şÄÚÈİ
-	 */
-	public static void asynSend(final String toMail,final String ccMail,final String subject,final String content){
-		asynSend(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, ccMail, subject, content, null);
-	}
-	
-	/***
-	 * Òì²½·¢ËÍÓÊ¼ş²¢³­ËÍ£¬·¢ËÍ¸½¼ş
-	 * @param toMail ÊÕ¼şÈËµØÖ·
-	 * @param subject ÓÊ¼ş±êÌâ
-	 * @param content ÓÊ¼şÄÚÈİ
-	 * @param files ¸½¼ş
-	 */
-	public static void asynSend(final String toMail,final String ccMail,final String subject,final String content,final String ...files){
-		asynSend(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, ccMail, subject, content, Arrays.asList(files));
-	}
-	
-	/***
-	 * Òì²½·¢ËÍÓÊ¼ş²¢³­ËÍ£¬·¢ËÍ¸½¼ş
-	 * @param toMail ÊÕ¼şÈËµØÖ·
-	 * @param ccMail ³­ËÍ
-	 * @param subject ÓÊ¼ş±êÌâ
-	 * @param content ÓÊ¼şÄÚÈİ
-	 * @param files ¸½¼ş
-	 */
-	public static void asynSend(final String toMail,final String ccMail,final String subject,final String content,final List<String> files){
-		asynSend(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, ccMail, subject, content, files);
-	}
-	
-	/**
-     * ·¢ËÍÓÊ¼ş
-     * @param smtp        ÓÊ¼şĞ­Òé
-     * @param fromAddress ·¢ËÍÈËµØÖ·
-     * @param fromPass    ·¢ËÍÈËÃÜÂë
-     * @param toAddress   ÊÕ¼şÈËµØÖ·
-     * @param ccAdress    ³­ËÍÈËµØÖ·
-     * @param subject     ·¢ËÍÖ÷Ìâ
-     * @param content     ·¢ËÍÄÚÈİ
+    /**å¸¸è§é‚®ä»¶å‘é€åè®®åœ°å€*/
+    public static final String SMTP_QQ = "smtp.qq.com";
+    public static final String SMTP_163 = "smtp.163.com";
+    public static final String SMTP_162 = "smtp.162.com";
+    public static final String SMTP_SINA = "smtp.sina.com";
+    public static final String SMTP_GMAIL = "smtp.gmail.com";
+
+    private static String CFG_SMTP = SMTP_QQ;
+    private static String SEND_USER = "";
+    private static String SEND_PASSWORD = "";
+
+    /**
+     * é…ç½®é‚®ä»¶åè®®å’Œè´¦æˆ·
+     * @param smtp  smtpåè®®
+     * @param user å‘ä»¶äººç”¨æˆ·å
+     * @param password å‘ä»¶äººå¯†ç 
+     */
+    public static void config(String smtp,String user,String password){
+        CFG_SMTP = smtp;
+        SEND_USER = user;
+        SEND_PASSWORD = password;
+    }
+
+    /**
+     * æ ¹æ®æ¨¡æ¿å‘é€
+     * @param mailTemplate
+     * @param subject
+     * @return
+     */
+    public static boolean send(MailTemplate mailTemplate,String subject){
+        if(null != mailTemplate && StringUtils.isNotBlank(subject)){
+            return sendProcess(CFG_SMTP, SEND_USER, SEND_PASSWORD,
+                    mailTemplate.getToMail(), mailTemplate.getCcMail(),
+                    subject, mailTemplate.toString(), mailTemplate.getFileList());
+        }
+        return false;
+
+    }
+
+    /**
+     * å‘é€é‚®ä»¶
+     * @param toMail æ”¶ä»¶äººåœ°å€
+     * @param subject å‘é€ä¸»é¢˜
+     * @param content å‘é€å†…å®¹
+     * @return
+     */
+    public static boolean send(String toMail,String subject,String content){
+        return sendProcess(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, null, subject, content, null);
+    }
+
+    /***
+     * å‘é€é‚®ä»¶å¹¶å‘é€ç¦å»º
+     * @param toMail æ”¶ä»¶äººåœ°å€
+     * @param subject å‘é€æ ‡é¢˜
+     * @param content å‘é€å†…å®¹
+     * @param files é™„ä»¶åˆ—è¡¨
+     * @return
+     */
+    public static boolean send(String toMail,String subject,String content,String ...files){
+        return sendProcess(CFG_SMTP,SEND_USER,SEND_PASSWORD,toMail,null,subject,content,Arrays.asList(files));
+    }
+
+    /***
+     * å‘é€é‚®ä»¶å¹¶å‘é€ç¦å»º
+     * @param toMail æ”¶ä»¶äººåœ°å€
+     * @param subject å‘é€æ ‡é¢˜
+     * @param content å‘é€å†…å®¹
+     * @param files é™„ä»¶åˆ—è¡¨
+     * @return
+     */
+    public static boolean send(String toMail,String subject,String content,List<String> files){
+        return sendProcess(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, null, subject, content, files);
+    }
+
+    /***
+     * å‘é€é‚®ä»¶å¹¶ä¸”æŠ„é€
+     * @param toMail æ”¶ä»¶äººåœ°å€
+     * @param ccMail æŠ„é€åœ°å€
+     * @param subject å‘é€ä¸»é¢˜
+     * @param content å‘é€å†…å®¹
+     * @return
+     */
+    public static boolean sendAndcc(String toMail,String ccMail,String subject,String content){
+        return sendProcess(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, ccMail, subject, content, null);
+    }
+
+    /**
+     * å‘é€é‚®ä»¶å¹¶æŠ„é€ï¼Œå¸¦é™„ä»¶
+     * @param toMail æ”¶ä»¶äººåœ°å€
+     * @param ccMail æŠ„é€åœ°å€
+     * @param subject
+     * @param content
+     * @param files
+     * @return
+     */
+    public static boolean sendAndcc(String toMail,String ccMail,String subject,String content,String ...files){
+        return sendProcess(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, ccMail, subject, content, Arrays.asList(files));
+    }
+
+    /**
+     * å‘é€é‚®ä»¶å¹¶æŠ„é€ï¼Œå¸¦é™„ä»¶
+     * @param toMail æ”¶ä»¶äººåœ°å€
+     * @param ccMail æŠ„é€åœ°å€
+     * @param subject
+     * @param content
+     * @param files
+     * @return
+     */
+    public static boolean sendAndcc(String toMail,String ccMail,String subject,String content,List<String> files){
+        return sendProcess(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, ccMail, subject, content, files);
+    }
+
+    /**
+     * å‘é€é‚®ä»¶
+     * @param smtp åè®®
+     * @param fromAddress å‘ä»¶äººåœ°å€
+     * @param fromPass å‘ä»¶äººå¯†ç 
+     * @param toMailList æ”¶ä»¶äººåœ°å€
+     * @param ccAddress æŠ„é€åœ°å€
+     * @param subject é‚®ä»¶æ ‡é¢˜
+     * @param content é‚®ä»¶å†…å®¹
+     * @param fileList é™„ä»¶
+     * @return
+     */
+    public static boolean sendProcess(String smtp,String fromAddress,String fromPass
+            ,String toMailList,String ccAddress,String subject,String content,List<String> fileList){
+        try {
+            EmailHandle emailHandle = new EmailHandle(smtp);
+            emailHandle.setFrom(fromAddress);
+            emailHandle.setNeedAuth(true);
+            emailHandle.setSubject(subject);
+            emailHandle.setBody(content);
+            emailHandle.setToList(toMailList);
+
+            /**æ·»åŠ æŠ„é€**/
+            if(StringUtils.isNotEmpty(ccAddress)){
+                emailHandle.setCopyToList(ccAddress);
+            }
+
+            emailHandle.setFrom(fromAddress);
+            emailHandle.setNamePass(fromAddress, fromPass);
+
+            if(null != fileList && fileList.size()>0){
+                /**é™„åŠ æ–‡ä»¶è·¯åŠ²**/
+                for (String file : fileList) {
+                    emailHandle.addFileAffix(file);
+                }
+            }
+            return emailHandle.sendEmail();
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /*******************************************************å¼‚æ­¥å‘é€ï¼šS***************************************************/
+    /**
+     * æ ¹æ®æ¨¡æ¿å‘é€
+     * @param mailTemplate
+     * @param subject
+     * @return
+     */
+    public static void asynSend(MailTemplate mailTemplate,String subject){
+        if(null != mailTemplate && StringUtils.isNotBlank(subject)){
+            asynSend(CFG_SMTP, SEND_USER, SEND_PASSWORD,
+                    mailTemplate.getToMail(), mailTemplate.getCcMail(),
+                    subject, mailTemplate.toString(), mailTemplate.getFileList());
+        }
+    }
+
+    /**
+     * å¼‚æ­¥å‘é€é‚®ä»¶
+     * @param toMail æ”¶ä»¶äººåœ°å€
+     * @param subject é‚®ä»¶æ ‡é¢˜
+     * @param content é‚®ä»¶å†…å®¹
+     */
+    public static void asynSend(final String toMail,final String subject,final String content){
+        asynSend(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, null, subject, content, null);
+    }
+
+    /***
+     * å¼‚æ­¥å‘é€é‚®ä»¶å¹¶æŠ„é€
+     * @param toMail æ”¶ä»¶äººåœ°å€
+     * @param ccMail æŠ„é€äººåœ°å€
+     * @param subject é‚®ä»¶æ ‡é¢˜
+     * @param content é‚®ä»¶å†…å®¹
+     */
+    public static void asynSend(final String toMail,final String ccMail,final String subject,final String content){
+        asynSend(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, ccMail, subject, content, null);
+    }
+
+    /***
+     * å¼‚æ­¥å‘é€é‚®ä»¶å¹¶æŠ„é€ï¼Œå‘é€é™„ä»¶
+     * @param toMail æ”¶ä»¶äººåœ°å€
+     * @param subject é‚®ä»¶æ ‡é¢˜
+     * @param content é‚®ä»¶å†…å®¹
+     * @param files é™„ä»¶
+     */
+    public static void asynSend(final String toMail,final String ccMail,final String subject,final String content,final String ...files){
+        asynSend(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, ccMail, subject, content, Arrays.asList(files));
+    }
+
+    /***
+     * å¼‚æ­¥å‘é€é‚®ä»¶å¹¶æŠ„é€ï¼Œå‘é€é™„ä»¶
+     * @param toMail æ”¶ä»¶äººåœ°å€
+     * @param ccMail æŠ„é€
+     * @param subject é‚®ä»¶æ ‡é¢˜
+     * @param content é‚®ä»¶å†…å®¹
+     * @param files é™„ä»¶
+     */
+    public static void asynSend(final String toMail,final String ccMail,final String subject,final String content,final List<String> files){
+        asynSend(CFG_SMTP, SEND_USER, SEND_PASSWORD, toMail, ccMail, subject, content, files);
+    }
+
+    /**
+     * å‘é€é‚®ä»¶
+     * @param smtp        é‚®ä»¶åè®®
+     * @param fromAddress å‘é€äººåœ°å€
+     * @param fromPass    å‘é€äººå¯†ç 
+     * @param toAddress   æ”¶ä»¶äººåœ°å€
+     * @param ccAdress    æŠ„é€äººåœ°å€
+     * @param subject     å‘é€ä¸»é¢˜
+     * @param content     å‘é€å†…å®¹
      * @throws Exception
      */
     public static boolean asynSend(final String smtp,final String fromAddress,final String fromPass,final String toAddress,
-            final String ccAdress,final String subject, final String content,final List<String> fileList){
+                                   final String ccAdress,final String subject, final String content,final List<String> fileList){
         Boolean flag = Boolean.FALSE;
         FutureTask<Boolean> futureTask = null;
         ExecutorService excutorService = Executors.newCachedThreadPool();
-        // Ö´ĞĞÈÎÎñ
+        // æ‰§è¡Œä»»åŠ¡
         futureTask = new FutureTask<Boolean>(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
@@ -260,14 +260,14 @@ public class MailKit {
                 emailHandle.setSubject(subject);
                 emailHandle.setBody(content);
                 emailHandle.setToList(toAddress);
-                /**Ìí¼Ó³­ËÍ**/
+                /**æ·»åŠ æŠ„é€**/
                 if(StringUtils.isNotEmpty(ccAdress)){
                     emailHandle.setCopyToList(ccAdress);
                 }
                 emailHandle.setFrom(fromAddress);
                 emailHandle.setNamePass(fromAddress, fromPass);
                 if(null != fileList && fileList.size() > 0){
-                    /** ¸½¼şÎÄ¼şÂ·¾¶ **/
+                    /** é™„ä»¶æ–‡ä»¶è·¯å¾„ **/
                     for(String file : fileList){
                         emailHandle.addFileAffix(file);
                     }
@@ -276,10 +276,10 @@ public class MailKit {
             }
         });
         excutorService.submit(futureTask);
-         
+
         try {
-            // ÈÎÎñÃ»³¬Ê±ËµÃ÷·¢ËÍ³É¹¦
-            flag = futureTask.get(5L, TimeUnit.SECONDS); 
+            // ä»»åŠ¡æ²¡è¶…æ—¶è¯´æ˜å‘é€æˆåŠŸ
+            flag = futureTask.get(5L, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             futureTask.cancel(true);
             e.printStackTrace();

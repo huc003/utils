@@ -12,231 +12,231 @@ import com.alibaba.fastjson.JSONObject;
 
 
 /**
- * reids¹¤¾ßÀà
+ * reidså·¥å…·ç±»
  * @author Administrator
  *
  */
 public class RedisUtils {
-	
-	private static final Log log = LogFactory.getLog(RedisUtils.class);
-	
-	private static final String IP = "127.0.0.1";
-	private static final int PORT = 6379;
-	private static final String AUTH = "";
-	private static int MAX_ACTIVE = 1024;
-	private static int MAX_IDLE = 200;
-	private static long MAX_WAIT	= 10000;
-	private static int TIMEOUT = 10000;
-	private static boolean BORROW = true;
-	private static JedisPool pool = null;
-	
-	//Óò
-	public static String USERINFO="user_info"; //ÓÃ»§ĞÅÏ¢
-	
-	/**
-	 * ³õÊ¼»¯Á¬½Ó³Ø
-	 */
-	static{
-		JedisPoolConfig config = new JedisPoolConfig();
-		config.setMaxTotal(MAX_ACTIVE);
-		config.setMaxIdle(MAX_IDLE);
-		config.setMaxWaitMillis(MAX_WAIT);
-		config.setTestOnBorrow(BORROW);
-		pool = new JedisPool(config, IP, PORT,TIMEOUT);
-	}
-	
-	/***
-	 * ³õÊ¼»¯Á´½Ó
-	 * @return
-	 */
-	public static synchronized Jedis getJedis(){
-		try {
-			if(pool != null){
-				return pool.getResource();
-			}else{
-				return null;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			log.info("Á¬½Ó³ØÁ´½ÓÒì³£");
-			return null;
-		}
-	}
-	
-	/***
-	 * ÉèÖÃÊ§Ğ§Ê±¼ä
-	 * @param key
-	 * @param seconds
-	 */
-	public static void setTime(String key,int seconds){
-		Jedis jedis = null;
-		try {
-			jedis = getJedis();
-			jedis.expire(key, seconds);
-		} catch (Exception e) {
-			log.info("ÉèÖÃÊ§Ğ§Ê§°Ü");
-		}finally{
-			getClose(jedis);
-		}
-	}
-	
-	/**
-	 * ĞÂÔö¶ÔÏó
-	 * @param key
-	 * @param obj
-	 * @return
-	 */
-	public static boolean addKeyword(String key,Object obj){
-		Jedis jedis = null;
-		String value = JSONObject.toJSONString(obj);
-		try {
-			jedis = getJedis();
-			String code = jedis.set(key, value);
-			if(code.equals("OK")){
-				log.info("ĞÂÔö¶ÔÏó³É¹¦,key:"+key);
-				return true;
-			}
-		} catch (Exception e) {
-			log.info("Ìí¼ÓÊı¾İÒì³£");
-			return false;
-		}finally{
-			getClose(jedis);
-		}
-		return false;
-	}
-	
-	/**
-	 * ĞÂÔökey~value
-	 * @param key
-	 * @param value
-	 * @return
-	 */
-	public static boolean addKeyword(String key,String value){
-		Jedis jedis = null;
-		try {
-			jedis = getJedis();
-			String code = jedis.set(key, value);
-			if(code.equals("OK")){
-				log.info("ĞÂÔö¶ÔÏó³É¹¦,key:"+key);
-				return true;
-			}
-		} catch (Exception e) {
-			log.info("²åÈëÊı¾İÒì³£");
-			return false;
-		}finally{
-			getClose(jedis);
-		}
-		return false;
-	}
-	
-	/**
-	 * »ñÈ¡key
-	 * @param key
-	 * @return
-	 */
-	public static String getKeyword(String key){
-		Jedis jedis = null;
-		try {
-			jedis = getJedis();
-			return jedis.get(key);
-		} catch (Exception e) {
-			log.info("»ñÈ¡keyÒì³££º"+key);
-		}
-		return "";
-	}
-	
-	/**
-	 * É¾³ıkey
-	 * @param key
-	 * @return
-	 */
-	public static boolean delKey(String key){
-		Jedis jedis = null;
-		try {
-			jedis = getJedis();
-			Long code = jedis.del(key);
-			if(code>1){
-				log.info("É¾³ı¶ÔÏó³É¹¦,key:"+key);
-				return true;
-			}
-		} catch (Exception e) {
-			log.info("É¾³ıkey£º"+key+"Òì³£");
-			return false;
-		}finally{
-			getClose(jedis);
-		}
-		return false;
-	}
-	
-	/**
-	 * Ä³Ò»¸öÓòÌí¼Ókey
-	 * @param key
-	 * @param value
-	 */
-	public static void hset(String key,String value,String group){
-		Jedis jedis = null;
-		try {
-			jedis = getJedis();
-			if(jedis.hexists(group, key)){
-				jedis.hdel(group, key);
-			}
-			jedis.hset(group, key, value);
-			log.info(" channelName:"+key+" Ìí¼ÓÖµ£º"+value+"¸üĞÂ³É¹¦¡£");
-		} catch (Exception e) {
-			log.info(" channelName:"+group+" Ìí¼Ó²ÎÊı:"+key+" Öµ£º"+value+"Ê§°Ü£¬ÉÔºóÖØĞÂÌí¼Ó,Òì³£ĞÅÏ¢:"+e.getMessage());
-		}finally{
-			getClose(jedis);
-		}
-	}
-	
-	/**
-	 * ´ÓÄ³Ò»¸öÓò»ñÈ¡key
-	 * @param key
-	 * @return
-	 */
-	public static String hget(String key,String group){
-		Jedis jedis = null;
-		try {
-			jedis = getJedis();
-			if(jedis==null){
-				return "";
-			}
-			return jedis.hget(group, key);
-		} catch (Exception e) {
-			log.info(" channelName:"+group+" ¶ÁÈ¡²ÎÊı:"+key+" Ê§°Ü£¬ÉÔºóÖØĞÂÌí¼Ó,Òì³£ĞÅÏ¢:"+e.getMessage());
-			e.printStackTrace();
-		}finally{
-			getClose(jedis);
-		}
-		return "";
-	}
-	
-	/**
-	 * É¾³ıÄ³¸öÓòµÄkey
-	 * @param key
-	 * @param group
-	 */
-	public static void hdel(String key,String group){
-		Jedis jedis = null;
-		try {
-			jedis = getJedis();
-			jedis.hdel(group, key);
-			log.info(" channelName:"+key+" É¾³ı³É¹¦");
-		} catch (Exception e) {
-			log.info(" channelName:"+group+" É¾³ı²ÎÊı:"+key+" Ê§°Ü£¬ÉÔºóÖØĞÂÌí¼Ó,Òì³£ĞÅÏ¢:"+e.getMessage());
-		}finally{
-			getClose(jedis);
-		}
-	}
 
-	/**
-	 * ¹Ø±ÕÁ´½Ó
-	 * @param jedis
-	 */
-	private static void getClose(Jedis jedis) {
-		if(jedis != null){
-			jedis.close();
-		}
-	}
-	
+    private static final Log log = LogFactory.getLog(RedisUtils.class);
+
+    private static final String IP = "127.0.0.1";
+    private static final int PORT = 6379;
+    private static final String AUTH = "";
+    private static int MAX_ACTIVE = 1024;
+    private static int MAX_IDLE = 200;
+    private static long MAX_WAIT	= 10000;
+    private static int TIMEOUT = 10000;
+    private static boolean BORROW = true;
+    private static JedisPool pool = null;
+
+    //åŸŸ
+    public static String USERINFO="user_info"; //ç”¨æˆ·ä¿¡æ¯
+
+    /**
+     * åˆå§‹åŒ–è¿æ¥æ± 
+     */
+    static{
+        JedisPoolConfig config = new JedisPoolConfig();
+        config.setMaxTotal(MAX_ACTIVE);
+        config.setMaxIdle(MAX_IDLE);
+        config.setMaxWaitMillis(MAX_WAIT);
+        config.setTestOnBorrow(BORROW);
+        pool = new JedisPool(config, IP, PORT,TIMEOUT);
+    }
+
+    /***
+     * åˆå§‹åŒ–é“¾æ¥
+     * @return
+     */
+    public static synchronized Jedis getJedis(){
+        try {
+            if(pool != null){
+                return pool.getResource();
+            }else{
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("è¿æ¥æ± é“¾æ¥å¼‚å¸¸");
+            return null;
+        }
+    }
+
+    /***
+     * è®¾ç½®å¤±æ•ˆæ—¶é—´
+     * @param key
+     * @param seconds
+     */
+    public static void setTime(String key,int seconds){
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            jedis.expire(key, seconds);
+        } catch (Exception e) {
+            log.info("è®¾ç½®å¤±æ•ˆå¤±è´¥");
+        }finally{
+            getClose(jedis);
+        }
+    }
+
+    /**
+     * æ–°å¢å¯¹è±¡
+     * @param key
+     * @param obj
+     * @return
+     */
+    public static boolean addKeyword(String key,Object obj){
+        Jedis jedis = null;
+        String value = JSONObject.toJSONString(obj);
+        try {
+            jedis = getJedis();
+            String code = jedis.set(key, value);
+            if(code.equals("OK")){
+                log.info("æ–°å¢å¯¹è±¡æˆåŠŸ,key:"+key);
+                return true;
+            }
+        } catch (Exception e) {
+            log.info("æ·»åŠ æ•°æ®å¼‚å¸¸");
+            return false;
+        }finally{
+            getClose(jedis);
+        }
+        return false;
+    }
+
+    /**
+     * æ–°å¢key~value
+     * @param key
+     * @param value
+     * @return
+     */
+    public static boolean addKeyword(String key,String value){
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            String code = jedis.set(key, value);
+            if(code.equals("OK")){
+                log.info("æ–°å¢å¯¹è±¡æˆåŠŸ,key:"+key);
+                return true;
+            }
+        } catch (Exception e) {
+            log.info("æ’å…¥æ•°æ®å¼‚å¸¸");
+            return false;
+        }finally{
+            getClose(jedis);
+        }
+        return false;
+    }
+
+    /**
+     * è·å–key
+     * @param key
+     * @return
+     */
+    public static String getKeyword(String key){
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            return jedis.get(key);
+        } catch (Exception e) {
+            log.info("è·å–keyå¼‚å¸¸ï¼š"+key);
+        }
+        return "";
+    }
+
+    /**
+     * åˆ é™¤key
+     * @param key
+     * @return
+     */
+    public static boolean delKey(String key){
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            Long code = jedis.del(key);
+            if(code>1){
+                log.info("åˆ é™¤å¯¹è±¡æˆåŠŸ,key:"+key);
+                return true;
+            }
+        } catch (Exception e) {
+            log.info("åˆ é™¤keyï¼š"+key+"å¼‚å¸¸");
+            return false;
+        }finally{
+            getClose(jedis);
+        }
+        return false;
+    }
+
+    /**
+     * æŸä¸€ä¸ªåŸŸæ·»åŠ key
+     * @param key
+     * @param value
+     */
+    public static void hset(String key,String value,String group){
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            if(jedis.hexists(group, key)){
+                jedis.hdel(group, key);
+            }
+            jedis.hset(group, key, value);
+            log.info(" channelName:"+key+" æ·»åŠ å€¼ï¼š"+value+"æ›´æ–°æˆåŠŸã€‚");
+        } catch (Exception e) {
+            log.info(" channelName:"+group+" æ·»åŠ å‚æ•°:"+key+" å€¼ï¼š"+value+"å¤±è´¥ï¼Œç¨åé‡æ–°æ·»åŠ ,å¼‚å¸¸ä¿¡æ¯:"+e.getMessage());
+        }finally{
+            getClose(jedis);
+        }
+    }
+
+    /**
+     * ä»æŸä¸€ä¸ªåŸŸè·å–key
+     * @param key
+     * @return
+     */
+    public static String hget(String key,String group){
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            if(jedis==null){
+                return "";
+            }
+            return jedis.hget(group, key);
+        } catch (Exception e) {
+            log.info(" channelName:"+group+" è¯»å–å‚æ•°:"+key+" å¤±è´¥ï¼Œç¨åé‡æ–°æ·»åŠ ,å¼‚å¸¸ä¿¡æ¯:"+e.getMessage());
+            e.printStackTrace();
+        }finally{
+            getClose(jedis);
+        }
+        return "";
+    }
+
+    /**
+     * åˆ é™¤æŸä¸ªåŸŸçš„key
+     * @param key
+     * @param group
+     */
+    public static void hdel(String key,String group){
+        Jedis jedis = null;
+        try {
+            jedis = getJedis();
+            jedis.hdel(group, key);
+            log.info(" channelName:"+key+" åˆ é™¤æˆåŠŸ");
+        } catch (Exception e) {
+            log.info(" channelName:"+group+" åˆ é™¤å‚æ•°:"+key+" å¤±è´¥ï¼Œç¨åé‡æ–°æ·»åŠ ,å¼‚å¸¸ä¿¡æ¯:"+e.getMessage());
+        }finally{
+            getClose(jedis);
+        }
+    }
+
+    /**
+     * å…³é—­é“¾æ¥
+     * @param jedis
+     */
+    private static void getClose(Jedis jedis) {
+        if(jedis != null){
+            jedis.close();
+        }
+    }
+
 }
